@@ -159,6 +159,7 @@ if SYSLOG_SSL and not SYSLOG_SSL_VERIFY:
 syslog_handler = TlsSysLogHandler(
     address=(SYSLOG_HOST, SYSLOG_PORT), socktype=socktype, ssl=use_ssl
 )
+syslog_handler.append_nul = False
 formatter = logging.Formatter(
     f"%(asctime)s %(ip)s %(prog)s: %(message)s",
     defaults={"ip": HAOS_HOSTNAME},
