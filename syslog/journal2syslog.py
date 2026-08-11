@@ -159,6 +159,7 @@ if SYSLOG_SSL and not SYSLOG_SSL_VERIFY:
 syslog_handler = TlsSysLogHandler(
     address=(SYSLOG_HOST, SYSLOG_PORT), socktype=socktype, ssl=use_ssl
 )
+syslog_handler.append_nul = False
 formatter = logging.Formatter(
     f"%(asctime)s %(ip)s %(prog)s: %(message)s",
     defaults={"ip": HAOS_HOSTNAME},
@@ -173,10 +174,13 @@ last_container_log_level: dict[str, int] = {}
 while True:
     change = jr.wait(timeout=None)
     for entry in jr:
-        extra = {"prog": entry.get("SYSLOG_IDENTIFIER")}
+        container_name = entry.get("CONTAINER_NAME")
+        syslog_identifier = entry.get("SYSLOG_IDENTIFIER")
+        program = container_name or syslog_identifier or "unknown"
+        extra = {"prog": program}
 
         # remove shell colors from container messages
-        if (container_name := entry.get("CONTAINER_NAME")) is not None:
+        if container_name is not None:
             msg = re.sub(r"\x1b\[\d+m", "", entry.get("MESSAGE"))
         else:
             msg = entry.get("MESSAGE")
