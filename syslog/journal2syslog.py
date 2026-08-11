@@ -160,8 +160,9 @@ syslog_handler = TlsSysLogHandler(
     address=(SYSLOG_HOST, SYSLOG_PORT), socktype=socktype, ssl=use_ssl
 )
 syslog_handler.append_nul = False
+message_terminator = "\n" if socktype == socket.SOCK_STREAM else ""
 formatter = logging.Formatter(
-    f"%(asctime)s %(ip)s %(prog)s: %(message)s",
+    fmt=f"%(asctime)s %(ip)s %(prog)s: %(message)s{message_terminator}",
     defaults={"ip": HAOS_HOSTNAME},
     datefmt="%b %d %H:%M:%S",
 )
